@@ -1,0 +1,251 @@
+---
+title: "CPS_Scenario"
+author: "Genevieve Sullivan"
+date: "2/18/2020"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r}
+
+CPS = read.csv("/Users/genevievesullivan/Desktop/CPS 2019 Project/Scenario_analysis/Fruit_EnABLe_A_scenario_1000it_localseed_scenario5.csv",skip=6)
+
+CPS = read.csv("/Users/genevievesullivan/Desktop/CPS 2019 Project/Scenario_analysis/Fruit_EnABLe_B_Scenarios_local_seed_S5.csv",skip=6)
+
+DF2 <- CPS
+```
+
+
+```{r}
+#Subset scenario 1 data
+scenario1 = grep("Scenario-1", DF2$sampling.sites)
+scenario1 <- DF2[scenario1,]
+
+scenario1a <- grep("first-hour", scenario1$sampling.time)
+scenario1a <- scenario1[scenario1a,]
+
+scenario1b <- grep("mid-production", scenario1$sampling.time)
+scenario1b <- scenario1[scenario1b,]
+
+scenario1c <- grep("second-shift", scenario1$sampling.time)
+scenario1c <- scenario1[scenario1c,]
+```
+
+```{r}
+#Subset scenario 2 data
+scenario2 = grep("Scenario-2", DF2$sampling.sites)
+scenario2 <- DF2[scenario2,]
+
+scenario2a <- grep("first-hour", scenario2$sampling.time)
+scenario2a <- scenario2[scenario2a,]
+
+scenario2b <- grep("mid-production", scenario2$sampling.time)
+scenario2b <- scenario2[scenario2b,]
+
+scenario2c <- grep("second-shift", scenario2$sampling.time)
+scenario2c <- scenario2[scenario2c,]
+```
+
+```{r}
+#Subset scenario 3 data
+scenario3 = grep("Scenario-3", DF2$sampling.sites)
+scenario3 <- DF2[scenario3,]
+
+scenario3a <- grep("first-hour", scenario3$sampling.time)
+scenario3a <- scenario3[scenario3a,]
+
+scenario3b <- grep("mid-production", scenario3$sampling.time)
+scenario3b <- scenario3[scenario3b,]
+
+scenario3c <- grep("second-shift", scenario3$sampling.time)
+scenario3c <- scenario3[scenario3c,]
+```
+
+```{r}
+#Subset scenario 4 data
+scenario4 = grep("Scenario-4", DF2$sampling.sites)
+scenario4 <- DF2[scenario4,]
+
+scenario4a <- grep("first-hour", scenario4$sampling.time)
+scenario4a <- scenario4[scenario4a,]
+
+scenario4b <- grep("mid-production", scenario4$sampling.time)
+scenario4b <- scenario4[scenario4b,]
+
+scenario4c <- grep("second-shift", scenario4$sampling.time)
+scenario4c <- scenario4[scenario4c,]
+```
+
+```{r}
+#Subset scenario 5 data
+scenario5 = grep("Scenario-5", DF2$sampling.sites)
+scenario5 <- DF2[scenario5,]
+
+scenario5a <- grep("first-hour", scenario5$sampling.time)
+scenario5a <- scenario5[scenario5a,]
+
+scenario5b <- grep("mid-production", scenario5$sampling.time)
+scenario5b <- scenario5[scenario5b,]
+
+scenario5c <- grep("second-shift", scenario5$sampling.time)
+scenario5c <- scenario5[scenario5c,]
+```
+
+
+
+```{r}
+#True Prevalence Versus PPV. Optimal is when TP=PPV. If above the line, more robust but not reflecting true prevalence. Does an optimal sampling approach defined as having a PPV = TP? Discus what is optimal?
+#Diagnoal abline(0,1) is optimal
+#Fit line to points to get slope of the points to see how slope compares to optimal slope. 
+ab = scenario1a$a.table+scenario1a$b.table
+ab = median(ab)
+abcd = scenario1a$a.table+scenario1a$b.table + scenario1a$c.table+scenario1a$d.table
+abcd = median(abcd)
+
+TP_1a = (scenario1a$a.table+scenario1a$c.table)/abcd*100
+PPV_1a = scenario1a$a.table/ab*100
+delt1a = PPV_1a - TP_1a
+TP_1b = (scenario1b$a.table+scenario1b$c.table)/abcd*100
+PPV_1b = scenario1b$a.table/ab*100
+delt1b = PPV_1b - TP_1b
+TP_1c = (scenario1c$a.table+scenario1c$c.table)/abcd*100
+PPV_1c = scenario1c$a.table/ab*100
+delt1c = PPV_1c - TP_1c
+TP_2a = (scenario2a$a.table+scenario2a$c.table)/abcd*100
+PPV_2a = scenario2a$a.table/ab*100
+delt2a = PPV_2a - TP_2a
+TP_2b = (scenario2b$a.table+scenario2b$c.table)/abcd*100
+PPV_2b = scenario2b$a.table/ab*100
+delt2b = PPV_2b - TP_2b
+TP_2c = (scenario2c$a.table+scenario2c$c.table)/abcd*100
+PPV_2c = scenario2c$a.table/ab*100
+delt2c = PPV_2c - TP_2c
+TP_3a = (scenario3a$a.table+scenario3a$c.table)/abcd*100
+PPV_3a = scenario3a$a.table/ab*100
+delt3a = PPV_3a - TP_3a
+TP_3b = (scenario3b$a.table+scenario3b$c.table)/abcd*100
+PPV_3b = scenario3b$a.table/ab*100
+delt3b = PPV_3b - TP_3b
+TP_3c = (scenario3c$a.table+scenario3c$c.table)/abcd*100
+PPV_3c = scenario3c$a.table/ab*100
+delt3c = PPV_3c - TP_3c
+TP_4a = (scenario4a$a.table+scenario4a$c.table)/abcd*100
+PPV_4a = scenario4a$a.table/ab*100
+delt4a = PPV_4a - TP_4a
+TP_4b = (scenario4b$a.table+scenario4b$c.table)/abcd*100
+PPV_4b = scenario4b$a.table/ab*100
+delt4b = PPV_4b - TP_4b
+TP_4c = (scenario4c$a.table+scenario4c$c.table)/abcd*100
+PPV_4c = scenario4c$a.table/ab*100
+delt4c = PPV_4c - TP_4c
+TP_5a = (scenario5a$a.table+scenario5a$c.table)/abcd*100
+PPV_5a = scenario5a$a.table/ab*100
+delt5a = PPV_5a - TP_5a
+TP_5b = (scenario5b$a.table+scenario5b$c.table)/abcd*100
+PPV_5b = scenario5b$a.table/ab*100
+delt5b = PPV_5b - TP_5b
+TP_5c = (scenario5c$a.table+scenario5c$c.table)/abcd*100
+PPV_5c = scenario5c$a.table/ab*100
+delt5c = PPV_5c - TP_5c
+```
+
+```{r}
+#Plots to compare slopes of scenarios
+# Adding the 0 term tells the lm() to fit the line through the origin
+par(mfrow=c(1,3),mar=c(8,4,4,4))
+plot(TP_4a, delt4a, ylim=c(-10,30), xlim=c(0,30), col=c("white"), main=c("First Hour"), xlab=c("True Prevalence"), ylab=c("Sampling Performance"), yaxs="i", xaxs="i")
+abline(lm(delt1a ~ TP_1a +0, data=scenario1a), col = c("#332288"), lwd=2, lty=1)
+abline(lm(delt2a ~ TP_2a +0, data=scenario2a), col = c("#88ccee"), lwd=2, lty=1)
+abline(lm(delt3a ~ TP_3a +0, data=scenario3a), col = c("#ddcc77"), lwd=2, lty=1)
+abline(lm(delt4a ~ TP_4a +0, data=scenario4a), col = c("#cc6677"), lwd=2, lty=1)
+abline(lm(delt5a ~ TP_5a +0, data=scenario5a), col = c("#009E73"), lwd=2, lty=1)
+abline(h=0)
+legend(2,-20, legend = c("Scenario1", "Scenario2","Scenario3","Scenario4"), col=c("#332288","#88ccee","#ddcc77","#cc6677"), lty=1, lwd=2, xpd=NA, horiz=TRUE, cex=1.1, text.width=22)
+
+plot(TP_4b, delt4b, ylim=c(-10,30), xlim=c(0,30), col=c("white"), main=c("Mid-Production"), xlab=c("True Prevalence"), ylab=c("Sampling Performance"), yaxs="i", xaxs="i")
+abline(lm(delt1b ~ TP_1b +0, data=scenario1b), col = c("#332288"), lwd=2, lty=1)
+abline(lm(delt2b ~ TP_2b +0, data=scenario2b), col = c("#88ccee"), lwd=2, lty=1)
+abline(lm(delt3b ~ TP_3b +0, data=scenario3b), col = c("#ddcc77"), lwd=2, lty=1)
+abline(lm(delt4b ~ TP_4b +0, data=scenario4b), col = c("#cc6677"), lwd=2, lty=1)
+abline(lm(delt5b ~ TP_5b +0, data=scenario5b), col = c("#009E73"), lwd=2, lty=1)
+abline(h=0)
+
+
+plot(TP_4c, delt4c, ylim=c(-10,30), xlim=c(0,30), col=c("white"), main=c("Second Shift"), xlab=c("True Prevalence"), ylab=c("Sampling Performance"), yaxs="i", xaxs="i")
+abline(lm(delt1c ~ TP_1c +0, data=scenario1c), col = c("#332288"), lwd=2, lty=1)
+abline(lm(delt2c ~ TP_2c +0, data=scenario2c), col = c("#88ccee"), lwd=2, lty=1)
+abline(lm(delt3c ~ TP_3c +0, data=scenario3c), col = c("#ddcc77"), lwd=2, lty=1)
+abline(lm(delt4c ~ TP_4c +0, data=scenario4c), col = c("#cc6677"), lwd=2, lty=1)
+abline(lm(delt5c ~ TP_5c +0, data=scenario5c), col = c("#009E73"), lwd=2, lty=1)
+abline(h=0)
+```
+
+
+
+```{r}
+#Create legend
+plot(TP_4a, delt4a, ylim=c(-10,30), xlim=c(0,30), col=c("white"), xlab=c(""), ylab=c(""), yaxs="i", xaxs="i")
+abline(h=0)
+legend(0,-18, legend = c("Baseline", "FDA","Random","Zone 3","Model-Based"), col=c("#332288","#88ccee","#ddcc77","#cc6677","#009E73"), lty=1, lwd=3, xpd=NA, horiz=TRUE, cex=0.7, text.width=3.3)
+```
+
+
+```{r}
+#Plots with 95% confidence intervals
+plot_pre <- ggplot()+
+  #geom_point(data=scenario1a, aes(x=TP_1a, y=delt1a),color='#332288', size = 1) + 
+    geom_smooth(data=scenario1a, aes(x=TP_1a, y=delt1a),method=lm, color='#332288', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario2a,aes(x=TP_2a, y=delt2a),color='#88ccee', size = 1) + 
+    geom_smooth(data=scenario2a,aes(x=TP_2a, y=delt2a),method=lm, color='#88ccee', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario3a,aes(x=TP_3a, y=delt3a),color='#ddcc77', size = 1) + 
+    geom_smooth(data=scenario3a,aes(x=TP_3a, y=delt3a),method=lm, color='#ddcc77', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario4a,aes(x=TP_4a, y=delt4a),color='#cc6677', size = 1) + 
+    geom_smooth(data=scenario4a,aes(x=TP_4a, y=delt4a),method=lm, color='#cc6677', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario5a,aes(x=TP_5a, y=delt5a),color='#009E73', size = 1) + 
+    geom_smooth(data=scenario5a,aes(x=TP_5a, y=delt5a),method=lm, color='#009E73', se=TRUE, formula=y~x+0) +
+  theme_bw()+ 
+  scale_x_continuous(name="True Prevalence (%)", limits=c(0,20)) +
+  scale_y_continuous(name="Sampling Performance (%)",limits=c(-10,20)) + 
+  geom_hline(yintercept=0) +
+  ggtitle("First Shift")
+
+plot_mid <- ggplot()+
+  #geom_point(data=scenario1b, aes(x=TP_1b, y=delt1b),color='#332288', size = 1) + 
+    geom_smooth(data=scenario1b, aes(x=TP_1b, y=delt1b+0),method=lm, color='#332288', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario2b,aes(x=TP_2b, y=delt2b),color='#88ccee', size = 1) + 
+    geom_smooth(data=scenario2b,aes(x=TP_2b, y=delt2b+0),method=lm, color='#88ccee', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario3b,aes(x=TP_3b, y=delt3b),color='#ddcc77', size = 1) + 
+    geom_smooth(data=scenario3b,aes(x=TP_3b, y=delt3b+0),method=lm, color='#ddcc77', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario4b,aes(x=TP_4b, y=delt4b),color='#cc6677', size = 1) + 
+    geom_smooth(data=scenario4b,aes(x=TP_4b, y=delt4b+0),method=lm, color='#cc6677', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario5b,aes(x=TP_5b, y=delt5b),color='#009E73', size = 1) + 
+    geom_smooth(data=scenario5b,aes(x=TP_5b, y=delt5b+0),method=lm, color='#009E73', se=TRUE, formula=y~x+0) +
+  theme_bw()+ 
+  scale_x_continuous(name="True Prevalence (%)", limits=c(0,20)) +
+  scale_y_continuous(name="Sampling Performance (%)",limits=c(-10,20)) + 
+  geom_hline(yintercept=0) +
+  ggtitle("Mid Production")
+
+plot_second <- ggplot()+
+  #geom_point(data=scenario1c, aes(x=TP_1c, y=delt1c),color='#332288', size = 1) + 
+    geom_smooth(data=scenario1c, aes(x=TP_1c, y=delt1c),method=lm, color='#332288', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario2c,aes(x=TP_2c, y=delt2c),color='#88ccee', size = 1) + 
+    geom_smooth(data=scenario2c,aes(x=TP_2c, y=delt2c),method=lm, color='#88ccee', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario3c,aes(x=TP_3c, y=delt3c),color='#ddcc77', size = 1) + 
+    geom_smooth(data=scenario3c,aes(x=TP_3c, y=delt3c),method=lm, color='#ddcc77', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario4c,aes(x=TP_4c, y=delt4c),color='#cc6677', size = 1) + 
+    geom_smooth(data=scenario4c,aes(x=TP_4c, y=delt4c),method=lm, color='#cc6677', se=TRUE, formula=y~x+0) +
+  #geom_point(data=scenario5c,aes(x=TP_5c, y=delt5c),color='#009E73', size = 1) + 
+    geom_smooth(data=scenario5c,aes(x=TP_5c, y=delt5c),method=lm, color='#009E73', se=TRUE, formula=y~x+0) +
+  theme_bw()+ 
+  scale_x_continuous(name="True Prevalence (%)", limits=c(0,20)) +
+  scale_y_continuous(name="Sampling Performance (%)",limits=c(-10,20)) + 
+  geom_hline(yintercept=0) +
+  ggtitle("Second Shift")
+
+library(cowplot)
+plot_grid(plot_pre, plot_mid, plot_second, nrow=1)
+```
+

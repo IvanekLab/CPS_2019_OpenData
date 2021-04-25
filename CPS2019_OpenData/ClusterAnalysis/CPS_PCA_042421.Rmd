@@ -1,0 +1,313 @@
+---
+title: "CPS_PCA"
+author: "Genevieve Sullivan"
+date: "3/20/2020"
+output: html_document
+---
+
+```{r}
+##################################Group Analysis########################################
+########example data set
+#install.packages(c("FactoMineR", "factoextra"))
+library(FactoMineR)
+library(factoextra)
+
+#zones<-read.csv("C:/Users/cez23/Desktop/04-02-18 Hu Model/040518_Sim_zoneData.csv")
+
+library(readxl)
+zones <- read_excel("/Users/genevievesullivan/Desktop/CPS 2019 Project/PCA/CPS_PCA_A.xlsx")
+zones <- read_excel("/Users/genevievesullivan/Desktop/CPS 2019 Project/PCA/CPS_PCA_B.xlsx")
+zones <- read_excel("/Users/genevievesullivan/Desktop/CPS 2019 Project/PCA/CPS_PCA_AB_Combined.xlsx") 
+
+zones$zone<-as.factor(zones$zone)
+zones$cleanable<-as.factor(zones$cleanable)
+zones$out.links<-as.numeric(zones$out.links)
+zones$in.links<-as.numeric(zones$in.links)
+zones$undirected.links<-as.numeric(zones$undirected.links)
+zones$contacts_list<-as.integer(zones$contacts_list)
+str(zones)
+#just using a subset of the data - attributes - mixed data (zone, height, cleanable, links(3))
+#df2 <- zones[,c(5,6,8,10:12)]
+df2 <- zones[,c(3,4,6,10:12)]
+
+
+#just using a subset of the data - outcomes - continuous
+#df3 <- zones[,c(13:22,30:34)]
+df3 <- zones[,c(13, 15:23)]
+
+
+
+#FAMD analysis 
+res.famd <- FAMD(df2, graph = FALSE, ncp=5)
+#res.famd <- FAMD(zones, graph = FALSE, ncp=10)
+print(res.famd)
+
+#PCA analysis for contamination outcomes - continuous
+res.pca <- PCA(df3, scale.unit = TRUE, ncp = 4, graph = FALSE) #use 4 dim when all sites included, 5 with #3 excluded
+
+
+#visualize output of FAMD/PCA analysis
+#The proportion of variances retained by the different dimensions (axes) can be extracted using the function get_eigenvalue()
+#print eigenvalues to determine the number of dimensions/principle components to use
+eig.val <- get_eigenvalue(res.famd)
+eig.val2 <- get_eigenvalue(res.pca)
+#head(eig.val)
+print(eig.val)
+print(eig.val2)
+fviz_screeplot(res.famd)
+fviz_screeplot(res.pca, ncp=4)
+```
+
+
+```{r}
+
+#FAMD- ALL variables analysis
+#The function get_mfa_var() [in factoextra] is used to extract the results for variables. 
+#By default, this function returns a list containing the coordinates, the cos2 and the contribution of all variables
+var <- get_famd_var(res.famd)
+var <- get_pca_var(res.pca)
+var
+# Coordinates of variables
+head(var$coord)
+# Cos2: quality of representation on the factore map
+head(var$cos2)
+
+#remove rows with NaN
+newvar <- var$cos2[-c(6,10), ]
+
+# Contributions to the  dimensions
+head(var$contrib)
+# Plot of variables
+#Positively correlated variables are grouped together.
+#Negatively correlated variables are positioned on opposite sides of the plot origin (opposed quadrants).
+fviz_famd_var(res.famd, repel = TRUE)
+fviz_pca_var(res.pca, col.var = "black") #Variables that are away from the origin are well represented on the factor map.
+# Contribution to the first dimension
+fviz_contrib(res.famd, "var", axes = 1) # cleanable, zone 
+fviz_pca_var(res.pca, col.var = "black") #Variables that are away from the origin are well represented on the factor map.
+# Contribution to the second dimension
+fviz_contrib(res.famd, "var", axes = 2) #zone, in.links, out.links
+fviz_contrib(res.famd, "var", axes = 3) #undirected.links, out.links
+fviz_contrib(res.famd, "var", axes = 4) #undirected.links, height, out.links
+fviz_contrib(res.famd, "var", axes = 5) #zone, height
+```
+
+
+```{r, include=TRUE}
+#visualize the cos2 of variables on all the dimensions (PCA)
+#install.packages("corrplot")
+library(corrplot)
+corrplot(var$cos2, is.corr=FALSE)
+corrplot(newvar, is.corr=FALSE)
+
+```
+
+
+```{r, include=FALSE}
+fviz_pca_var(res.pca, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE # Avoid text overlapping
+)
+# Contributions of variables to PC1
+fviz_contrib(res.famd, choice = "var", axes = 1, top = 10)
+fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+# Contributions of variables to PC2
+fviz_contrib(res.famd, choice = "var", axes = 2, top = 10)
+fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+# Contributions of variables to dimensions
+fviz_famd_var(res.famd, col.var = "contrib",
+
+)              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07")
+fviz_pca_var(res.pca, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07")
+)
+##individual analysis from PCA output
+#fviz_pca_ind(res.pca, pointsize = "cos2", 
+#             pointshape = 21, fill = "#E7B800",
+#             repel = TRUE # Avoid text overlapping (slow if many points)
+#)
+fviz_pca_ind(res.pca,
+             geom.ind = "point", # show points only (nbut not "text")
+             col.ind = zones$zone, # color by groups
+             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             addEllipses = TRUE, # Concentration ellipses
+             legend.title = "Groups"
+)
+str(zones)
+fviz_pca_ind(res.pca,
+             geom.ind = "point", # show points only (nbut not "text")
+             col.ind = zones$cleanable, # color by groups
+             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             addEllipses = TRUE, # Concentration ellipses
+             legend.title = "Cleanable"
+)
+fviz_pca_biplot(res.pca, 
+                col.ind = zonesub$cleanable, palette = "jco", 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE,
+                legend.title = "Cleanable") 
+
+fviz_pca_biplot(res.pca, axes = c(1,2),
+                # Individuals
+                geom.ind = "point",
+                fill.ind = zonesub$zone, col.ind = "black",
+                pointshape = 21, pointsize = 2,
+                palette = "jco",
+                addEllipses = TRUE, #ellipse.type = "confidence",
+                # Variables
+                col.var = "contrib",  #alpha.var ="contrib", 
+                #gradient.cols = "RdYlBu",
+                
+                legend.title = list(fill = "Zone", color = "Contrib")
+                #alpha = "Contrib")
+)
+
+fviz_pca_biplot(res.pca, select.ind = list(contrib = 10), 
+                select.var = list(contrib = 5),
+                ggtheme = theme_minimal())
+
+```
+
+```{r, include=FALSE}
+#FAMD- Quantitative variables analysis
+#Briefly, the graph of variables (correlation circle) shows the relationship between variables, 
+#the quality of the representation of variables, as well as, the correlation between variables and the dimensions.
+quanti.var <- get_famd_var(res.famd, "quanti.var")
+quanti.var 
+fviz_famd_var(res.famd, "quanti.var", repel = TRUE,
+              col.var = "black")
+
+#The most contributing quantitative variables can be highlighted on the scatter plot using the 
+#argument col.var = "contrib". This produces a gradient colors, which can be customized using the argument gradient.cols.
+
+fviz_famd_var(res.famd, "quanti.var", col.var = "contrib", 
+              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+              repel = TRUE)
+
+```
+
+```{r, include=FALSE}
+
+#Similarly, you can highlight quantitative variables using their cos2 values representing the quality of representation on the factor map. 
+#If a variable is well represented by two dimensions, the sum of the cos2 is close to one. 
+#For some of the items, more than 2 dimensions might be required to perfectly represent the data.
+
+# Color by cos2 values: quality on the factor map
+fviz_famd_var(res.famd, "quanti.var", col.var = "cos2",
+              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+              repel = TRUE)
+
+#Like quantitative variables, the results for qualitative variables can be extracted as follow:
+quali.var <- get_famd_var(res.famd, "quali.var")
+quali.var 
+fviz_famd_var(res.famd, "quali.var", col.var = "contrib", 
+              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+
+#To get the results for individuals, type this:
+ind <- get_famd_ind(res.famd)
+ind
+fviz_famd_ind(res.famd, col.ind = "cos2", 
+              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+              repel = FALSE)
+fviz_famd_ind(res.famd, col.ind = "contrib", 
+              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+              repel = FALSE, invisible = "quali.var")
+
+#Individuals with similar profiles are close to each other on the factor map. 
+#It's possible to color the individuals using any of the qualitative variables in the initial data table. 
+#To do this, the argument habillage is used in the fviz_famd_ind() function. 
+#For example, if you want to color the agents according to the supplementary qualitative variable "zone.category", type this:
+fviz_mfa_ind(res.famd, 
+             habillage = "cleanable", # color by groups 
+             #palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             #addEllipses = TRUE, ellipse.type = "confidence", 
+             repel = FALSE # Avoid text overlapping
+) 
+
+#If you want to color individuals using multiple categorical variables at the same time, use the function fviz_ellipses() [in factoextra] as follow:
+fviz_ellipses(res.famd,"zone", repel = FALSE)
+fviz_ellipses(res.famd, habillage = c("zone", "cleanable"), repel = FALSE)
+```
+
+```{r}
+#HCPC - Hierarchical Clustering on Principal Components
+#When you have a mixed data of continuous and categorical variables, you can first perform FAMD (factor analysis of mixed data) or MFA (multiple factor analysis). 
+#Next, you can apply cluster analysis on the FAMD/MFA outputs. nb.clust = 0, user clicks. nb.clust = -1, program decides. or enter any positive integer
+res.hcpc <- HCPC(res.famd, graph = FALSE)
+res.hc<-hclust(dist(df2))
+fviz_dend(res.hc, rect= TRUE)
+head(res.hcpc$data.clust$clust, 10)
+
+res.hcpc <- HCPC(res.pca, graph = FALSE, nb.clust=-1)
+res.hcpc <- HCPC(res.pca, graph = FALSE, nb.clust=3) #play around with number of clusters, try 2 and see if the match
+res.hcpc <- HCPC(res.pca, graph = FALSE, nb.clust=4) #play around with number of clusters, try 2 and see if the match
+res.hcpc <- HCPC(res.pca, graph = FALSE, nb.clust=5) #play around with number of clusters, try 2 and see if the match
+
+zones$PCAClusters <- (res.hcpc$data.clust$clust) #add cluster# to existing zone data file
+zones$FAMDClusters <- (res.hcpc$data.clust$clust) #add cluster# to existing zone data file
+
+#save the file with cluster numbers 
+#write.csv(zones, file ="zones_PCA_clusterNumbers.csv")
+#To visualize the dendrogram generated by the hierarchical clustering, we'll use the function fviz_dend() [factoextra package]:
+fviz_dend(res.hcpc, 
+          cex = 0.5,                     # Label size
+          labels(row.names(df2)),
+          palette = "jco",               # Color palette see ?ggpubr::ggpar
+          rect = TRUE, rect_fill = TRUE, # Add rectangle around groups
+          rect_border = "jco",           # Rectangle color
+          #labels_track_height = 0.8      # Augment the room for labels
+)
+
+#It's possible to visualize individuals on the principal component map and to color individuals according to the cluster they belong to. 
+#The function fviz_cluster() [in factoextra] can be used to visualize individuals clusters.
+fviz_cluster(res.hcpc,
+             repel = FALSE,            # Avoid label overlapping
+             show.clust.cent = TRUE, # Show cluster centers
+             palette = "jco",         # Color palette see ?ggpubr::ggpar
+             ggtheme = theme_minimal(),
+             main = "Factor map"
+)
+
+plot(res.hcpc, choice = "3D.map")
+#To display the original data with cluster assignments, type this:
+head(res.hcpc$data.clust, 10)
+
+#To display quantitative variables that describe the most each cluster, type this:
+res.hcpc$desc.var$quanti
+res.hcpc$desc.var$test.chi2
+res.hcpc$desc.var$category
+
+#to show principal dimensions that are the most associated with clusters, type this:
+res.hcpc$desc.axes$quanti
+res.hcpc$desc.axes
+
+#representative individuals of each cluster can be extracted as follow:
+res.hcpc$desc.ind$para
+```
+
+```{r, include=FALSE}
+#For building the table
+FAMD1<-subset(zones,FAMDClusters==1)
+summary(FAMD1)
+FAMD2<-subset(zones,FAMDClusters==2)
+summary(FAMD2)
+FAMD3<-subset(zones,FAMDClusters==3)
+summary(FAMD3)
+FAMD4<-subset(zones,FAMDClusters==4)
+summary(FAMD4)
+FAMD5<-subset(zones,FAMDClusters==5)
+summary(FAMD5)
+FAMD6<-subset(zones,FAMDClusters==6)
+summary(FAMD6)
+
+PCA1<-subset(zones,PCAClusters==1)
+summary(PCA1)
+PCA2<-subset(zones,PCAClusters==2)
+summary(PCA2)
+PCA3<-subset(zones,PCAClusters==3)
+summary(PCA3)
+PCA4<-subset(zones,PCAClusters==4)
+summary(PCA4)
+PCA5<-subset(zones,PCAClusters==5)
+summary(PCA5)
+```

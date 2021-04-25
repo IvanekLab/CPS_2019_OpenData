@@ -1,0 +1,98 @@
+---
+title: "CPS_Sensitivity"
+author: "Genevieve Sullivan"
+date: "1/15/2020"
+output: html_document
+---
+```{r}
+Final = read.csv("/Users/genevievesullivan/Desktop/CPS 2019 Project/Sensitivity_Simulation_analysis/Fruit_EnABLe_031720 sensitivity_prevalence-table.csv", skip=6)
+Final = read.csv("/Users/genevievesullivan/Desktop/CPS 2019 Project/Sensitivity_Simulation_analysis/Fruit_EnABLe_B_030120 validation_simulation_sensitivity-table (1).csv", skip=6)
+
+```
+
+```{r}
+#install.packages("epiR")
+#install.packages("survival")
+#install.packages("sensitivity")
+library(epiR)
+library(survival)
+library(sensitivity)
+
+```
+
+```{r}
+#A few datasets of interest
+#add outcome of interest to input data frame
+dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$z1.prev))
+#dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$A.prev))
+#dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$B.prev))
+dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$dryer.prev))
+dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$Flume.prev))
+```
+
+
+```{r}
+#dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$w.z1.post))
+#dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$w.z2.post))
+dat<-data.frame(cbind(Final[,4:35],Final[,37:57],Final$w.z3.post))
+
+z<-epi.prcc(dat,sided.test = 2)
+prcc<-data.frame(cbind(z$gamma,z$p.value))
+rownames(prcc)<-colnames(dat[,1:53])
+colnames(prcc)<-(c("PRCC", "p.Value"))
+print(prcc)
+
+prcc$abs<-abs(prcc$PRCC)
+newprcc<-prcc[order(prcc$abs),]
+datamat<-matrix(c(newprcc$PRCC), ncol=53)
+colnames(datamat) <- rownames(newprcc)
+sigprcc<-subset(prcc, p.Value<(0.05/53))
+sigprcc<-prcc[c("tc43","tc34","tc33","tc32","tc31","tc21","tc14","tc13","tc11","p43","p34","p33","p32","p31","p22","p21","p13","p11","zone4.load","random.load","p.zone4.intro","p.random.noise","fruit.conc"),]
+#sigprcc<-subset(prcc, p.Value<0.05)
+sigprcc$abs<-abs(sigprcc$PRCC)
+print(sigprcc)
+nrc = nrow(sigprcc)
+newsigprcc<-sigprcc[order(sigprcc$abs),]
+datamat<-matrix(c(newsigprcc$PRCC), ncol=nrc)
+colnames(datamat) <- rownames(newsigprcc)
+
+
+#par(mfrow=c(1,1), mai=c(1, 2, 1, 1))
+#barplot(datamat, horiz = T,main="",beside=T,col=c('gray'),las=2, xlim = c(-0.2, 0.8), #cex.names=0.5)
+#abline(v=0)
+
+col_order <- c("tc43","tc34","tc33","tc32","tc31","tc21","tc14","tc13","tc11","p43","p34","p33","p32","p31","p22","p21","p13","p11","zone4.load","random.load","p.zone4.intro","p.random.noise","fruit.conc")
+my_data2 <- datamat[, col_order]
+my_data2
+
+
+
+
+par(mfrow=c(1,1), mai=c(1, 2, 1, 1))
+barplot(my_data2, horiz = T,main="",beside=T,col=c('white','gray','gray','gray','gray','white','white','gray','white','white','gray','gray','gray','gray','white','gray','gray','gray','gray','gray','gray','gray','gray'),las=2, xlim = c(-0.4, 0.8),cex.names=0.5,names.arg=expression(italic(tc43),italic(tc34),italic(tc33),italic(tc32),italic(tc31),italic(tc21),italic(tc14),italic(tc13),italic(tc11),italic(p43),italic(p34),italic(p33),italic(p32),italic(p31),italic(p22),italic(p21),italic(p13),italic(p11),italic(N[z]),italic(N[r]),italic(p[z]),italic(p[r]),italic(N[R])),xlab=c("PRCC"))
+abline(v=0)
+
+```
+
+```{r}
+##Labels to indicate significance to be substituted above. 
+#A1
+'white','white','white','white','white','gray','white','white','gray','white','white','white','white','white','white','gray','white','gray','gray','white','gray','white','gray'
+
+#A2
+'white','white','white','gray','white','white','white','white','white','white','white','white','white','white','white','white','white','gray','gray','white','gray','white','gray'
+
+#A3
+'gray','gray','white','gray','white','white','gray','white','white','gray','white','white','gray','white','white','white','white','white','gray','white','gray','white','gray'
+
+#B1
+'white','white','white','gray','white','gray','white','gray','white','white','gray','gray','gray','gray','white','gray','gray','gray','gray','gray','gray','gray','gray'
+
+#B2
+'white','white','gray','gray','gray','white','white','gray','white','white','white','gray','gray','gray','gray','white','gray','white','gray','gray','gray','gray','gray'
+
+#B3
+'white','gray','gray','gray','gray','white','white','gray','white','white','gray','gray','gray','gray','white','gray','gray','gray','gray','gray','gray','gray','gray'
+```
+
+
