@@ -2,7 +2,7 @@
 
 **Authors: Genevieve Sullivan, Claire Zoellner, Martin Wiedmann and Renata Ivanek.** 
 
-**Study: Using in silico models for design and optimization of science-based Listeria environmental monitoring programs in fresh-cut produce facilities (under peer review)**
+**Study: Using in silico models for design and optimization of science-based Listeria environmental monitoring programs in fresh-cut produce facilities. Applied and Environmental Microbiology (in press)**
 
 In this study, two agent-based models of fresh-cut produce facilities were developed as a way to simulate dynamics of Listeria in the built environment by modeling the different surfaces of equipment and employees in a facility as agents. The components of the model developed in NetLogo and R codes used to analyze the model outputs can be found in the following folders:
 
